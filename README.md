@@ -20,6 +20,15 @@ A collection of reusable [Claude Code skills](https://docs.anthropic.com/en/docs
   rfbrowser init
   ```
   The `rfbrowser init` step downloads the Playwright browser binaries.
+- **rf-mcp** (MCP server for interactive test development):
+  ```bash
+  pip install rf-mcp[web]
+  ```
+  Then register it with Claude Code:
+  ```bash
+  claude mcp add rf-mcp -- uvx rf-mcp
+  ```
+  rf-mcp enables Claude to execute test steps interactively and validate them before generating the final test suite. See the [rf-mcp setup guide](skills/rf-test-automation/references/rf-mcp-setup.md) for configuration options.
 
 ## How to Use
 

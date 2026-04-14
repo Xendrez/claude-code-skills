@@ -2,12 +2,12 @@
 name: rf-test-automation
 description: Create and maintain Robot Framework test automation with Browser Library (Playwright). Use when writing robot tests, creating page objects, adding BDD keywords, setting up RF project structure, or when the user mentions Robot Framework, .robot files, or Browser Library.
 argument-hint: [description of test or feature to automate]
-allowed-tools: Read, Write, Edit, Glob, Grep, Bash
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash, mcp__rf-mcp__analyze_scenario, mcp__rf-mcp__recommend_libraries, mcp__rf-mcp__manage_session, mcp__rf-mcp__execute_step, mcp__rf-mcp__execute_batch, mcp__rf-mcp__execute_flow, mcp__rf-mcp__find_keywords, mcp__rf-mcp__get_keyword_info, mcp__rf-mcp__get_session_state, mcp__rf-mcp__build_test_suite, mcp__rf-mcp__run_test_suite, mcp__rf-mcp__intent_action, mcp__rf-mcp__get_locator_guidance, mcp__rf-mcp__resume_batch, mcp__rf-mcp__check_library_availability, mcp__rf-mcp__set_library_search_order, mcp__rf-mcp__manage_library_plugins
 ---
 
 # Robot Framework Test Automation with Browser Library
 
-Create well-structured Robot Framework test suites using Browser Library (Playwright) following BDD style and the three-tier Page Object architecture.
+Create well-structured Robot Framework test suites using Browser Library (Playwright) following BDD style and the three-tier Page Object architecture. Uses [rf-mcp](https://github.com/manykarim/rf-mcp) to interactively execute and validate test steps before generating the final suite.
 
 ## When to Use
 
@@ -29,7 +29,63 @@ Before writing any code, check the project structure:
 3. Identify which pages and keywords already exist
 4. Check `requirements.txt` for dependencies
 
-### 2. Apply the Three-Tier Architecture
+### 2. Analyze the Test Scenario (rf-mcp)
+
+Use `analyze_scenario` to convert the natural language test description into a structured test intent:
+
+```
+analyze_scenario("User logs in, adds two items to cart, completes checkout, and verifies the order confirmation")
+```
+
+Then use `recommend_libraries` to confirm the right test library (typically Browser Library for web testing).
+
+### 3. Initialize a Session (rf-mcp)
+
+Use `manage_session` to start an interactive session and import the required libraries:
+
+```
+manage_session(action="init", library="Browser")
+```
+
+Use `check_library_availability` if unsure whether a library is installed.
+
+### 4. Execute Steps Interactively (rf-mcp)
+
+Run each test step one at a time, validating results as you go:
+
+- **`execute_step`** — Run a single Robot Framework keyword and inspect the result
+- **`execute_batch`** — Run multiple keywords in one call for efficiency
+- **`intent_action`** — Use library-agnostic intents (`click`, `fill`, `navigate`, `assert_visible`, `extract_text`, `wait_for`, `hover`, `select`) when you don't need library-specific keywords
+- **`get_locator_guidance`** — Get help choosing the right locator strategy
+- **`find_keywords`** — Discover available keywords by name or semantic search
+- **`get_keyword_info`** — Get documentation and argument signatures for a keyword
+
+When a step fails, inspect the error, adjust the approach (e.g., fix a locator), and retry. Use `get_session_state` to inspect variables, page source, or application state for debugging.
+
+Use `execute_flow` to build control structures (if/for_each/try) when needed.
+
+### 5. Build the Test Suite (rf-mcp)
+
+Once all steps execute successfully, use `build_test_suite` to generate the final .robot files. Request BDD format with Given/When/Then keywords:
+
+```
+build_test_suite(format="bdd")
+```
+
+The generated suite should follow the three-tier architecture described below. Review the output and adjust if needed.
+
+### 6. Run the Test Suite (rf-mcp)
+
+Use `run_test_suite` to validate or execute the generated suite:
+
+- **Dry mode** — Validate syntax without executing
+- **Execute mode** — Run the full suite and report results
+
+### 7. Save to Project Structure
+
+Write the generated .robot files into the correct project locations using the file tools (Write/Edit). Apply the three-tier architecture and naming conventions from the reference docs.
+
+## Three-Tier Architecture
 
 Every project follows this strict layered structure. See [references/project-structure.md](references/project-structure.md) for full details.
 
@@ -52,7 +108,7 @@ Tests → BDD Keywords → Page Keywords → Element Locators
 ```
 Never import upward. BDD keywords should NOT import element files directly.
 
-### 3. Write Files in Order
+## File Creation Order
 
 When adding automation for a new page:
 
@@ -74,7 +130,7 @@ When adding automation for a new page:
    - Pure BDD scenarios, import only the BDD keywords resource
    - See [templates/test-file.md](templates/test-file.md)
 
-### 4. Follow BDD Format
+## BDD Format
 
 **All test cases MUST use Given/When/Then structure:**
 
@@ -102,7 +158,9 @@ This single definition matches `Given the user is logged in`, `And the user is l
 
 **If the project already defines keywords WITH prefixes** (e.g., `Given the user is logged in`), follow the existing convention for consistency.
 
-### 5. Apply Naming Conventions
+See [references/bdd-patterns.md](references/bdd-patterns.md) for complete BDD patterns.
+
+## Naming Conventions
 
 See [references/naming-conventions.md](references/naming-conventions.md) for complete rules.
 
@@ -119,7 +177,7 @@ See [references/naming-conventions.md](references/naming-conventions.md) for com
 | Test files | `<feature>_test.robot` | `checkout_flow_test.robot` |
 | Tags | lowercase, hyphenated | `e2e`, `product-detail` |
 
-### 6. Use Browser Library Correctly
+## Browser Library Reference
 
 See [references/browser-library.md](references/browser-library.md) for complete patterns.
 
@@ -130,14 +188,7 @@ See [references/browser-library.md](references/browser-library.md) for complete 
 4. CSS selectors (`.class`, `tag.class`)
 5. `xpath=//expression` (last resort)
 
-**Browser lifecycle:**
-```robot
-New Browser    chromium    headless=${HEADLESS}
-New Context
-New Page       ${APP_URL}
-# ... test actions ...
-Close Browser    # In teardown
-```
+When using rf-mcp, use `get_locator_guidance` to get locator recommendations for specific elements.
 
 **Key rules:**
 - NEVER use `Sleep` -- Browser Library has auto-waiting built in
@@ -146,40 +197,9 @@ Close Browser    # In teardown
 - Use `Get Text` (not `Get Element Text`)
 - Use `Get Elements` for dynamic element lists, not hardcoded nth-child
 
-### 7. Design Generic Tests
+## rf-mcp Setup
 
-Tests should calculate expected values dynamically, never hardcode assertions:
-
-```robot
-# GOOD: Dynamic calculation
-${price}    Get Item Price    ${item_locator}
-${expected_total}    Evaluate    ${price} * ${quantity}
-Should Be Equal As Numbers    ${actual_total}    ${expected_total}
-
-# BAD: Hardcoded
-Should Be Equal    ${actual_total}    $49.66
-```
-
-### 8. Handle Variable Scoping
-
-When a BDD keyword captures data needed by a later BDD keyword in the same test:
-
-```robot
-the user captures the item price
-    ${price}    Get Item Price    ${LOC_FIRST_ITEM}
-    Set Test Variable    \${captured_price}    ${price}
-```
-
-The `\$` (escaped dollar) creates a test-level variable accessible to subsequent keywords.
-
-**Python expressions in Evaluate:**
-```robot
-# WRONG: f-strings break because RF resolves variables first
-${result}    Evaluate    f"${value:.2f}"
-
-# CORRECT: Use .format()
-${result}    Evaluate    "{:.2f}".format(${value})
-```
+See [references/rf-mcp-setup.md](references/rf-mcp-setup.md) for installation and configuration.
 
 ## Guidelines
 
@@ -194,3 +214,5 @@ ${result}    Evaluate    "{:.2f}".format(${value})
 - Keep BDD keywords at business language level -- no technical details
 - One keyword file per page, one element file per page
 - Add `results/` to `.gitignore` and use `--outputdir results/`
+- Design generic tests that calculate expected values dynamically, never hardcode assertions
+- When a BDD keyword captures data needed by a later keyword, use `Set Test Variable` with escaped `\$` syntax

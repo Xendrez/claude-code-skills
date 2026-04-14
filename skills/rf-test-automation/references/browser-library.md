@@ -1,5 +1,7 @@
 # Browser Library (Playwright) Patterns
 
+> **Note:** When rf-mcp is available, prefer using `intent_action` and `execute_step` to interact with Browser Library keywords interactively. The patterns below remain the reference for understanding and reviewing generated .robot files.
+
 ## Browser Lifecycle
 
 ### The Three-Tier Hierarchy: Browser > Context > Page
