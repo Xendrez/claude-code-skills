@@ -7,6 +7,7 @@ A collection of reusable [Claude Code skills](https://docs.anthropic.com/en/docs
 | Skill | Description |
 |-------|-------------|
 | [rf-test-automation](skills/rf-test-automation/) | Robot Framework test automation with Browser Library (Playwright). Three-tier Page Object architecture, BDD-style tests. |
+| [spec](skills/spec/) | Feature specification developer — creates phased specs with research-backed reference documents, user stories, and Gherkin acceptance tests. |
 
 ## Skill Prerequisites
 
@@ -29,6 +30,10 @@ A collection of reusable [Claude Code skills](https://docs.anthropic.com/en/docs
   claude mcp add rf-mcp -- uvx rf-mcp
   ```
   rf-mcp enables Claude to execute test steps interactively and validate them before generating the final test suite. See the [rf-mcp setup guide](skills/rf-test-automation/references/rf-mcp-setup.md) for configuration options.
+
+### spec
+
+No additional dependencies. Works out of the box with Claude Code's built-in tools (Read, Write, Edit, WebSearch, WebFetch, Agent).
 
 ## How to Use
 
