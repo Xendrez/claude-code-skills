@@ -8,6 +8,19 @@ A collection of reusable [Claude Code skills](https://docs.anthropic.com/en/docs
 |-------|-------------|
 | [rf-test-automation](skills/rf-test-automation/) | Robot Framework test automation with Browser Library (Playwright). Three-tier Page Object architecture, BDD-style tests. |
 
+## Skill Prerequisites
+
+### rf-test-automation
+
+- **Python** 3.8+
+- **Node.js** (required by Browser Library for Playwright)
+- **Robot Framework** and **Browser Library**:
+  ```bash
+  pip install robotframework>=7.0 robotframework-browser>=19.0
+  rfbrowser init
+  ```
+  The `rfbrowser init` step downloads the Playwright browser binaries.
+
 ## How to Use
 
 ### 1. Clone this repository
