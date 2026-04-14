@@ -13,7 +13,7 @@ A collection of reusable [Claude Code skills](https://docs.anthropic.com/en/docs
 ### 1. Clone this repository
 
 ```bash
-git clone https://github.com/<your-username>/claude-code-skills.git
+git clone https://github.com/Xendrez/claude-code-skills.git
 ```
 
 ### 2. Add a skill to your project
